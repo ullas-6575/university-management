@@ -1,0 +1,3 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<header th:fragment="nav"><a class="brand" href="/">Campus<span>CSE 3230</span></a><nav><a href="/">Dashboard</a><a th:if="${currentRole == 'ADMIN'}" href="/admins">Admins</a><a th:if="${currentRole == 'ADMIN' or currentRole == 'TEACHER'}" href="/teachers">Teachers</a><a th:if="${currentRole == 'ADMIN' or currentRole == 'STUDENT'}" href="/students">Students</a></nav><span class="identity" th:text="|${currentUsername} · ${currentRole}|"></span><form th:action="@{/logout}" method="post"><button class="outline">Logout</button></form></header>
+</body></html>
