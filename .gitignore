@@ -1,3 +1,4 @@
+.gitignore
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
@@ -31,3 +32,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local AI guidance files
+/.github/instructions/architecture.instructions.md
+/.github/instructions/security.instructions.md
+/.github/instructions/java.instructions.md
+/.github/instructions/testing.instructions.md
+/.github/instructions/containers.instructions.md
+/.github/instructions/workflow.instructions.md
