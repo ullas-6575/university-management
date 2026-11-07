@@ -18,7 +18,7 @@ public abstract class PersonDTO {
     private String email;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank(groups = ValidationGroups.Create.class)
-    @Pattern(regexp = "[ -~]{12,64}", message = "use 12-64 printable ASCII characters, or omit on update")
+    @Pattern(regexp = "[ -~]{6,64}", message = "use 6-64 printable ASCII characters, or omit on update")
     private String password;
 
     public Long getId() {

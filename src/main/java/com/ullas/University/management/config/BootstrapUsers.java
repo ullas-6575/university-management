@@ -52,8 +52,8 @@ public class BootstrapUsers implements ApplicationRunner {
     }
 
     private void fill(PersonDTO dto, String username, String name, String password) {
-        if (!password.matches("[ -~]{12,64}"))
-            throw new IllegalArgumentException("Seed passwords must be 12-64 printable ASCII characters");
+        if (!password.matches("[ -~]{6,64}"))
+            throw new IllegalArgumentException("Seed passwords must be 6-64 printable ASCII characters");
         dto.setUsername(username);
         dto.setName(name);
         dto.setEmail(username + "@example.test");

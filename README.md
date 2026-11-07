@@ -1,82 +1,158 @@
-# University Management
+# University Management System
 
-A Spring Boot web application scaffold for managing university administrators, teachers, and students. The repository includes Thymeleaf page templates and MVC/REST controller files.
+A Java 17 Spring Boot web application for managing university users with three roles: Admin, Teacher, and Student. The project includes Thymeleaf MVC pages, role-based Spring Security, JPA repositories, and REST CRUD endpoints for each resource type.
 
-## Maven Coordinates
+## Tech stack
 
-- Group ID: `com.ullas`
-- Artifact ID: `University-management`
-- Version: `0.0.1-SNAPSHOT`
-- Java package: `com.ullas.University.management`
-- Main class: `com.ullas.University.management.UniversityManagementApplication`
+- Java 17
+- Spring Boot 4.1.2
+- Spring MVC + Thymeleaf
+- Spring Security
+- Spring Data JPA
+- H2 in-memory database
+- Docker Compose
+- Maven Wrapper
 
-## Project Status
+## Roles and permissions
 
-The application uses Spring MVC, Thymeleaf, Spring Security, Spring Data JPA, and H2 for local development. H2 is configured as an in-memory database, so all records are discarded when the application stops. This is a development setup, not a production persistence configuration.
+| Role    | Admins | Teachers | Students |
+| ------- | ------ | -------- | -------- |
+| ADMIN   | CRUD   | CRUD     | CRUD     |
+| TEACHER | Denied | CRUD     | Denied   |
+| STUDENT | Denied | Denied   | CRUD     |
 
-Initial accounts are not created by default. To enable the optional local seed accounts, set strong passwords for all three roles; never commit these values.
+The access rules are enforced in the Spring Security configuration and controller-level `@PreAuthorize` checks.
+
+## Demo users
+
+When the app starts with seed mode enabled, these accounts are created automatically:
+
+| Role    | Username  | Password   |
+| ------- | --------- | ---------- |
+| Admin   | `admin`   | `Admin1`   |
+| Teacher | `teacher` | `Teacher1` |
+| Student | `student` | `Student1` |
+
+These are safe local-development demo credentials and are intentionally short enough for lab use.
+
+## Project structure
+
+- `src/main/java/com/ullas/University/management` — application code
+- `src/main/resources/templates/templates` — Thymeleaf pages
+- `src/main/resources/static/css` — static CSS assets
+- `src/test/java` — unit and integration tests
+- `Dockerfile` — container image for the app
+- `compose.yaml` — Docker Compose setup
+- `.github/workflows/ci.yml` — CI workflow for Java 17 verification
 
 ## Requirements
 
 - Java 17
-- Docker Engine with the Docker Compose plugin, if using containers
+- Maven Wrapper included in the repo
+- Docker + Compose plugin (optional, for containerized runs)
 
-The Maven wrapper is included, so a separate Maven installation is not required for local builds.
+## Run locally with Maven
 
-## Run Locally
-
-From the repository root:
+From the project root:
 
 ```bash
-./mvnw test
+cd /media/ullas-biswas-shontu/New\ Volume/code/swe/University-management
 ./mvnw spring-boot:run
 ```
 
-To seed accounts for a local session, set passwords in the shell before starting the application:
+Open the app in a browser:
 
-```bash
-export APP_SEED_ENABLED=true
-export APP_SEED_ADMIN_PASSWORD='replace-with-a-unique-password-12-chars-or-more'
-export APP_SEED_TEACHER_PASSWORD='replace-with-another-unique-password'
-export APP_SEED_STUDENT_PASSWORD='replace-with-a-third-unique-password'
-./mvnw spring-boot:run
+```text
+http://localhost:8080
 ```
 
-When seeding is enabled on an empty database, the logins are `admin`, `teacher`, and `student`, each using its corresponding environment password. After startup, open [http://localhost:8080](http://localhost:8080).
-
-## Run With Docker Compose
-
-Set the same four `APP_SEED_*` environment variables before Compose if you want seed accounts, then run:
+If port 8080 is already in use, start on another port:
 
 ```bash
-docker compose config
+SERVER_PORT=8081 ./mvnw spring-boot:run
+```
+
+Then open:
+
+```text
+http://localhost:8081
+```
+
+## Run locally with seeded demo accounts
+
+To create the demo admin/teacher/student users automatically:
+
+```bash
+cd /media/ullas-biswas-shontu/New\ Volume/code/swe/University-management
+APP_SEED_ENABLED=true ./mvnw spring-boot:run
+```
+
+Then log in with:
+
+- Username: `admin` / Password: `Admin1`
+- Username: `teacher` / Password: `Teacher1`
+- Username: `student` / Password: `Student1`
+
+The login screen is available at:
+
+```text
+http://localhost:8080/login
+```
+
+or:
+
+```text
+http://localhost:8081/login
+```
+
+## Run with Docker Compose
+
+From the repo root:
+
+```bash
+cd /media/ullas-biswas-shontu/New\ Volume/code/swe/University-management
 docker compose up --build
 ```
 
-Compose publishes the application on `127.0.0.1:8080` by default. Change the host port with `APP_PORT`, for example:
+The app is published on `127.0.0.1:8080` by default. To use a different host port:
 
 ```bash
-APP_PORT=8081 docker compose up --build
+echo 'APP_PORT=8081' > .env
+docker compose up --build
 ```
 
-Stop the foreground service with `Ctrl+C`, then remove its container and network with:
+If you want seeded users in Docker too:
+
+```bash
+APP_SEED_ENABLED=true docker compose up --build
+```
+
+To stop the app:
 
 ```bash
 docker compose down
 ```
 
-Compose binds the service to loopback, runs the process as a non-root user, and applies container resource and filesystem restrictions. A successful `docker compose config` validates configuration only; it does not prove application behavior or production security.
+## Test the project
 
-## Tests
-
-Run the test suite with:
+Run the full suite:
 
 ```bash
 ./mvnw test
 ```
 
-The test suite includes six service unit tests for account updates and admin deletion rules, plus Spring MVC integration tests for page rendering, authentication, role boundaries, and admin creation through both the form and REST API. GitHub Actions runs `./mvnw --batch-mode --no-transfer-progress verify` on Java 17 for pushes, pull requests, and manual dispatches.
+The project includes:
 
-## Security Notes
+- unit tests for account hashing and normalization
+- service tests for admin deletion rules
+- integration tests for app startup, login, security, and role access
 
-The application has database-backed authentication, BCrypt password encoding, role checks, and CSRF protection configured. This is not a production security certification: review authorization scope, operational secrets, database durability, TLS, and security tests before exposing it publicly or using real university data.
+## CI
+
+GitHub Actions runs the project against Java 17 and validates the app with Maven tests. The workflow also checks Docker Compose configuration so that broken container settings are detected before deployment.
+
+## Notes
+
+- The app uses H2 in memory for local development. Data is temporary and resets when the app stops.
+- Passwords must be printable ASCII and at least 6 characters long.
+- This project is intended for local lab/demo use, not for production deployment without further hardening.
